@@ -2,7 +2,7 @@ import sys
 import os.path
 import glob
 import errno
-import tokenizer
+import tokenizer2
 
 def main(argv):
     ##--variables para Estadisticas.txt--##
@@ -52,7 +52,12 @@ def main(argv):
             with open(name, encoding="utf-8",errors="ignore") as f:
                 pass
                 filedata = f.read()
-                lista_tokens=tokenizer.tokenizar(filedata)
+                lista_abreviaturas=tokenizer2.get_abreviaturas(filedata)
+                lista_urls=tokenizer2.get_mails_and_urls(filedata)
+                lista_nombres=tokenizer2.get_names(filedata)
+                lista_numeros = tokenizer2.get_numeros(filedata)
+                lista_tokens=tokenizer2.tokenizar(filedata)
+                lista_tokens=lista_tokens+lista_tokens+lista_numeros+lista_urls+lista_abreviaturas+lista_nombres
 
                 cant_tokens += len(lista_tokens)
 
@@ -62,7 +67,7 @@ def main(argv):
                     mayor_terms = len(lista_tokens)
                 ##---si se pasó por parámetro se quitan las palabras vacias-----##
                 if lista_vacias:
-                    lista_tokens=tokenizer.sacar_palabras_vacias(lista_tokens,lista_vacias)
+                    lista_tokens=tokenizer2.sacar_palabras_vacias(lista_tokens,lista_vacias)
                 ##--------------------------------------------------------------##
 
 
