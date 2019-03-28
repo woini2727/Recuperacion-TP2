@@ -2,7 +2,7 @@ import sys
 import os.path
 import glob
 import errno
-import tokenizer2
+import tokenizer
 
 def main(argv):
     ##--variables para Estadisticas.txt--##
@@ -52,13 +52,12 @@ def main(argv):
             with open(name, encoding="utf-8",errors="ignore") as f:
                 pass
                 filedata = f.read()
-                lista_abreviaturas=tokenizer2.get_abreviaturas(filedata)
-                lista_urls=tokenizer2.get_mails_and_urls(filedata)
-                lista_nombres=tokenizer2.get_names(filedata)
-                lista_numeros = tokenizer2.get_numeros(filedata)
-                lista_tokens=tokenizer2.tokenizar(filedata)
+                lista_abreviaturas=tokenizer.get_abreviaturas(filedata)
+                lista_urls=tokenizer.get_mails_and_urls(filedata)
+                lista_nombres=tokenizer.get_names(filedata)
+                lista_numeros = tokenizer.get_numeros(filedata)
+                lista_tokens=tokenizer.tokenizar(filedata)
                 lista_tokens=lista_tokens+lista_tokens+lista_numeros+lista_urls+lista_abreviaturas+lista_nombres
-
                 cant_tokens += len(lista_tokens)
 
                 if len(lista_tokens) < menor_terms:
@@ -67,7 +66,7 @@ def main(argv):
                     mayor_terms = len(lista_tokens)
                 ##---si se pasó por parámetro se quitan las palabras vacias-----##
                 if lista_vacias:
-                    lista_tokens=tokenizer2.sacar_palabras_vacias(lista_tokens,lista_vacias)
+                    lista_tokens=tokenizer.sacar_palabras_vacias(lista_tokens,lista_vacias)
                 ##--------------------------------------------------------------##
 
 
@@ -113,31 +112,43 @@ def main(argv):
     except IOError as exc:
         if exc.errno != errno.EISDIR:
             raise
-    cant_terminos+=len(dicc)
-    prom_tokens=cant_tokens//cant_doc
-    prom_terminos=cant_terminos//cant_doc
-    long_termino=0
-    frec_menor=cant_doc
-    frec_mayor=0
+    cant_terminos += len(dicc)
+    prom_tokens = cant_tokens // cant_doc
+    prom_terminos = cant_terminos // cant_doc
+    long_termino = 0
+    frec_menor = cant_doc
+    frec_mayor = 0
+    cont_frec_menor = 0
+    cont_frec_mayor = 0
 
+    # ---long de los terminos---#
     for key in dicc:
-        ##--saco la frecuencia--##
-        df,cf=dicc[key]
+        long_termino += len(key)
+    long_prom_term = long_termino // len(dicc)
+
+    # listas de frec menores
+    for key in dicc:
+        df, cf = dicc[key]
         if df <= frec_menor:
-            frec_menor=df
+            frec_menor = df
         if df >= frec_mayor:
-            frec_mayor=df
-        ##----------------------##
-        long_termino+=len(key)
-    long_prom_term=long_termino//len(dicc)
+            frec_mayor = df
 
-    for token in dicc:
-        df, cf = dicc[token]
-        if df == frec_menor:
-            dicc_frec_menor[token] = cf
-        if df == frec_mayor:
-            dicc_frec_mayor[token] = cf
+    while cont_frec_menor < 10:
+        for token in dicc:
+            df, cf = dicc[token]
+            if df == frec_menor:
+                dicc_frec_menor[token] = cf
+                cont_frec_menor += 1
+        frec_menor = frec_menor + 1
 
+    while cont_frec_mayor < 10:
+        for token in dicc:
+            df, cf = dicc[token]
+            if df == frec_mayor:
+                dicc_frec_mayor[token] = cf
+                cont_frec_mayor += 1
+        frec_mayor = frec_mayor - 1
     ##------------generar estadística.txt--------------##
 
     try:

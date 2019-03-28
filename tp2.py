@@ -114,24 +114,39 @@ def main(argv):
     long_termino=0
     frec_menor=cant_doc
     frec_mayor=0
+    cont_frec_menor=0
+    cont_frec_mayor=0
 
+    #---long de los terminos---#
     for key in dicc:
-        ##--saco la frecuencia--##
+        long_termino += len(key)
+    long_prom_term = long_termino // len(dicc)
+
+    #listas de frec menores
+    for key in dicc:
         df,cf=dicc[key]
         if df <= frec_menor:
             frec_menor=df
         if df >= frec_mayor:
             frec_mayor=df
-        ##----------------------##
-        long_termino+=len(key)
-    long_prom_term=long_termino//len(dicc)
 
-    for token in dicc:
-        df, cf = dicc[token]
-        if df == frec_menor:
-            dicc_frec_menor[token] = cf
-        if df == frec_mayor:
-            dicc_frec_mayor[token] = cf
+    while cont_frec_menor < 10:
+        for token in dicc:
+            df, cf = dicc[token]
+            if df == frec_menor:
+                dicc_frec_menor[token] = cf
+                cont_frec_menor+=1
+        frec_menor=frec_menor+1
+
+
+    while cont_frec_mayor < 10:
+        for token in dicc:
+            df, cf = dicc[token]
+            if df == frec_mayor:
+                dicc_frec_mayor[token] = cf
+                cont_frec_mayor += 1
+        frec_mayor = frec_mayor -1
+
 
     ##------------generar estadística.txt--------------##
 
