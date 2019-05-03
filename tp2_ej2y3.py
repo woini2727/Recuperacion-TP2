@@ -3,8 +3,6 @@ import os.path
 import glob
 import errno
 import tokenizer
-import unidecode
-
 
 def main(argv):
     ##------------------------------------------------------------------------##
@@ -53,18 +51,28 @@ def main(argv):
             with open(name, encoding="utf-8",errors="ignore") as f:
                 pass
                 filedata = f.read()
-                lista_tokens=tokenizer.tokenizar(filedata)
+                ##----------------- Add lists------------------------------------##
+                lista_abreviaturas = tokenizer.get_abreviaturas(filedata)
+                lista_urls = tokenizer.get_mails_and_urls(filedata)
+                lista_nombres = tokenizer.get_names(filedata)
+                lista_numeros = tokenizer.get_numeros(filedata)
+
+                ##-------------------solo para el ej 3-----------------------------------------##
+                lista_chemical_exp = tokenizer.get_chemical_expressions(filedata)
+                ##-----------------------------------------------------------------------------#
+                lista_tokens = tokenizer.tokenizar(filedata)
+                ##-------------------solo para el ej 2-----------------------------------------##
+                ##lista_tokens = lista_tokens + lista_tokens + lista_numeros + lista_urls + lista_abreviaturas + lista_nombres
+
+
                 cant_tokens += len(lista_tokens)
-                ##-------------------Conteo de terminos------------------------###
                 if len(lista_tokens) < menor_terms:
                     menor_terms = len(lista_tokens)
                 if len(lista_tokens) > mayor_terms:
                     mayor_terms = len(lista_tokens)
-                ##-------------------------------------------------------------###
-
-                ##-------------Quitar palabras vacias---------------------------##
+                ##---si se pasó por parámetro se quitan las palabras vacias-----##
                 if lista_vacias:
-                    lista_tokens=tokenizer.sacar_palabras_vacias(lista_tokens,lista_vacias)
+                    lista_tokens = tokenizer.sacar_palabras_vacias(lista_tokens, lista_vacias)
                 ##--------------------------------------------------------------##
 
                 terminos_archivo_actual=[]
@@ -148,9 +156,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
-def remove_punctuation ( text ):
-    text = text.replace("\n", " ")
-    text = text.lower()
-    text = unidecode.unidecode(text)
-    return re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
